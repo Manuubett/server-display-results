@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muminji & Evurore Wards · Live Election Results Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f0f4f8;
+            padding: 24px 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        /* header */
+        .header {
+            background: linear-gradient(145deg, #0a2647, #1a3f5c);
+            color: white;
+            border-radius: 30px;
+            padding: 30px 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 30px -10px rgba(0,20,40,0.4);
+        }
+        .header-top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .title h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .ward-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 1rem;
+        }
+        .ward-selector {
+            display: flex;
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
+            border-radius: 50px;
+        }
+        .ward-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .ward-btn.active {
+            background: white;
+            color: #0a2647;
+        }
+        .ward-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.15);
+        }
+        .summary-pills {
+            display: flex;
+            gap: 25px;
+            background: rgba(0,0,0,0.25);
+            padding: 12px 28px;
+            border-radius: 60px;
+            backdrop-filter: blur(5px);
+            margin-top: 15px;
+        }
+        .pill {
+            text-align: center;
+        }
+        .pill-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+        .pill-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        /* controls */
+        .control-panel {
+            background: white;
+            border-radius: 60px;
+            padding: 12px 20px 12px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+            border: 1px solid #e2eaf2;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-label {
+            font-weight: 600;
+            color: #1f3a5f;
+        }
+        select, input {
+            padding: 10px 18px;
+            border-radius: 40px;
+            border: 1px solid #d0ddee;
+            background: #f9fcff;
+            font-weight: 500;
+            color: #0f3b6a;
+            outline: none;
+            min-width: 180px;
+        }
+        .btn {
+            background: #0f3b6a;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .btn:hover {
+            background: #1b4f82;
+            transform: scale(1.02);
+        }
+        .btn-outline {
+            background: white;
+            color: #0f3b6a;
+            border: 1px solid #0f3b6a;
+        }
+        .btn-outline:hover {
+            background: #e6f0ff;
+            transform: scale(1.02);
+        }
+        .btn-group {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        /* LIVE indicator */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f2f6fc;
+            padding: 6px 18px 6px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid #c3d9f0;
+            margin-left: 10px;
+        }
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+            animation: pulse 1.8s infinite;
+        }
+        .live-dot.inactive {
+            background: #94a3b8;
+            animation: none;
+            box-shadow: none;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); }
+            70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+        .live-text {
+            color: #1e3a5f;
+        }
+        .admin-badge {
+            background: #f97316;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        /* summary cards */
+        .candidate-summary {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px -6px rgba(0,20,40,0.08);
+            border: 1px solid #e9eef4;
+            overflow-x: auto;
+        }
+        .summary-title {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #0b2d4b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .winner-badge {
+            background: #ffd966;
+            color: #7a5300;
+            padding: 3px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .candidate-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .candidate-table th {
+            background: #f4f9ff;
+            padding: 15px 12px;
+            text-align: left;
+            color: #1f4172;
+            font-weight: 600;
+            border-bottom: 2px solid #cdddec;
+        }
+        .candidate-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eef3f9;
+        }
+        .candidate-table tr:last-child td {
+            border-bottom: none;
+        }
+        .rank-1 {
+            background: #fff9e0;
+            font-weight: 600;
+        }
+        .rank-1 td:first-child {
+            border-left: 4px solid #f0b400;
+        }
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e2eaf2;
+            border-radius: 20px;
+            overflow: hidden;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #0f3b6a;
+            border-radius: 20px;
+        }
+        .irregularity-badge {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        /* stations table */
+        .stations-table-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 8px 20px -6px rgba(0,20,40,0.08);
+            border: 1px solid #e9eef4;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        .stations-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 1300px;
+        }
+        .stations-table th {
+            background: #f4f9ff;
+            padding: 14px 8px;
+            text-align: center;
+            color: #1f4172;
+            font-weight: 600;
+            border-bottom: 2px solid #cdddec;
+            position: sticky;
+            top: 0;
+        }
+        .stations-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #eef3f9;
+        }
+        .stations-table tbody tr:hover {
+            background: #f6fbff;
+        }
+        .station-name {
+            font-weight: 600;
+            color: #0b2d4b;
+            text-align: left !important;
+        }
+        .winner-cell {
+            background: #fff9e0;
+            font-weight: 700;
+            color: #7a5300;
+        }
+        .psv-cell {
+            font-weight: 600;
+            color: #0f3b6a;
+        }
+        .irregularity-cell {
+            background: #fff0f0;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .footnote {
+            margin-top: 15px;
+            color: #637e9c;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .download-format {
+            display: flex;
+            gap: 10px;
+        }
+        /* top navigation */
+        .top-nav {
+            width:100%;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:15px;
+        }
+        .nav-left {
+            display:flex;
+            gap:14px;
+            flex-wrap:wrap;
+        }
+        .nav-link {
+            text-decoration:none;
+            color:white;
+            background:rgba(255,255,255,0.12);
+            padding:8px 18px;
+            border-radius:40px;
+            font-weight:500;
+            font-size:0.9rem;
+            transition:0.2s;
+        }
+        .nav-link:hover {
+            background:rgba(255,255,255,0.25);
+        }
+        .nav-link.active {
+            background:white;
+            color:#0b2a4a;
+            font-weight:600;
+        }
+    </style>
+    <!-- PDF generation library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="title">
+                <h1>
+                    🗳️ Muminji & Evurore Wards
+                    <span class="ward-badge" id="totalRegisteredBadge">loading...</span>
+                </h1>
+                <div style="display:flex; gap:20px; margin-top:8px; flex-wrap:wrap;">
+                    <span id="stationsInfo">📍 loading stations...</span>
+                </div>
+            </div>
+            <div class="ward-selector">
+                <button class="ward-btn active" id="wardMuminjiBtn">🗳️ Muminji</button>
+                <button class="ward-btn" id="wardEvuroreBtn">🗳️ Evurore</button>
+            </div>
+        </div>
+        <div class="top-nav">
+            <div class="nav-left">
+                <a href="#" class="nav-link active">🏠 DASHBOARD</a>
+            </div>
+        </div>
+        <div class="summary-pills" id="headerStats">
+            <div class="pill">
+                <div class="pill-label">total votes cast</div>
+                <div class="pill-value" id="totalVotesCast">0</div>
+            </div>
+            <div class="pill">
+                <div class="pill-label">rejected</div>
+                <div class="pill-value" id="totalRejected">0</div>
+            </div>
+            <div class="pill">
+                <div class="pill-label">turnout</div>
+                <div class="pill-value" id="turnoutPct">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls + Live Indicator -->
+    <div class="control-panel">
+        <div class="filter-group">
+            <span class="filter-label">🔎 Show:</span>
+            <select id="filterStation">
+                <option value="all">All polling stations</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">📊 Sort by:</span>
+            <select id="sortBy">
+                <option value="name">Station name</option>
+                <option value="turnout">Turnout %</option>
+                <option value="discrepancy">Irregularities</option>
+            </select>
+        </div>
+        <!-- LIVE indicator -->
+        <div class="live-indicator" id="liveIndicator">
+            <span class="live-dot" id="liveDot"></span>
+            <span class="live-text" id="liveText">LIVE</span>
+            <span class="admin-badge" id="adminStatusBadge">results streaming</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="refreshBtn">🔄 Refresh data</button>
+            <button class="btn btn-outline" id="downloadPdfBtn">📄 Download PDF</button>
+            <button class="btn btn-outline" id="downloadCSV">📥 Download CSV</button>
+        </div>
+    </div>
+
+    <!-- Candidate Summary -->
+    <div class="candidate-summary">
+        <div class="summary-title">
+            🏆 Candidate Ranking & Totals - <span id="wardNameDisplay">Muminji Ward</span>
+            <span class="winner-badge" id="leadingCandidate">Loading...</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="candidate-table" id="candidateTotalsTable">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Party</th>
+                        <th>Total Votes</th>
+                        <th>PSV (%)</th>
+                        <th>Stations Won</th>
+                        <th>Lead Margin</th>
+                        <th>IEBC vs Agent</th>
+                    </tr>
+                </thead>
+                <tbody id="candidateTotalsBody">
+                    <tr><td colspan="7" style="text-align:center; padding:30px;">Loading candidate data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detailed Per-Polling Station Table -->
+    <div class="stations-table-wrapper">
+        <div class="summary-title">
+            📋 Per-Polling Station Results · <span id="wardStationsName">Muminji Ward</span>
+            <span style="font-size:0.9rem; font-weight:normal; margin-left:15px; color:#53718e;" id="stationsCount">0/0 stations reported</span>
+        </div>
+        <div id="tableContainer">
+            <table class="stations-table" id="resultsTable">
+                <thead id="tableHeader">
+                    <!-- Dynamic header based on ward -->
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="16" style="text-align:center; padding:40px;">⏳ Loading data from Firebase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footnote">
+            <div>
+                <strong>PSV</strong> = Percentage of Votes Cast · 
+                <strong>Margin</strong> = winner votes - runner-up votes<br>
+                🟨 Yellow = station winner · 🟥 Red = irregularity detected
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJEJGa_GBufklAc7gl9-TjjBbpxao7_J8",
+        authDomain: "tallying-9df93.firebaseapp.com",
+        projectId: "tallying-9df93"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ==================== WARD DATA ====================
+    
+    // Muminji Ward Stations (26 stations)
+    const MUMINJI_STATIONS = [
+        { name: "Kivue Primary School", voters: 686 },
+        { name: "Mbarwari Primary School", voters: 586 },
+        { name: "Cieria Primary School", voters: 492 },
+        { name: "Ndutori Primary School", voters: 486 },
+        { name: "Michegethiu Primary School", voters: 471 },
+        { name: "Gangara Primary School A", voters: 469 },
+        { name: "Gangara Primary School B", voters: 469 },
+        { name: "Nguthi Primary School", voters: 441 },
+        { name: "Kiamungongo Primary School", voters: 435 },
+        { name: "Itiira Primary School A", voters: 417 },
+        { name: "Itiira Primary School B", voters: 416 },
+        { name: "Karimari Primary School", voters: 404 },
+        { name: "Ngiirî Primary School A", voters: 402 },
+        { name: "Ngiirî Primary School B", voters: 401 },
+        { name: "Karambari Primary School", voters: 386 },
+        { name: "Kirie Primary School A", voters: 377 },
+        { name: "Kirie Primary School B", voters: 377 },
+        { name: "Gatakari Primary School", voters: 338 },
+        { name: "Rwagori Primary School", voters: 278 },
+        { name: "Mukororia Primary School", voters: 272 },
+        { name: "Kavui Primary School", voters: 232 },
+        { name: "Kandomba Primary School", voters: 229 },
+        { name: "Gatothia Primary School", voters: 164 },
+        { name: "Kianjogu Primary School", voters: 148 },
+        { name: "Kathutheri Primary School", voters: 142 },
+        { name: "Mianjatiri Primary School", voters: 131 }
+    ];
+
+    // Evurore Ward Stations (67 stations)
+    const EVURORE_STATIONS = [
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 1)", voters: 589 },
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 2)", voters: 588 },
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 3)", voters: 588 },
+        { name: "KAVENGERO PRIMARY SCHOOL (Stream 1)", voters: 508 },
+        { name: "KAVENGERO PRIMARY SCHOOL (Stream 2)", voters: 508 },
+        { name: "IRIRI PRIMARY SCHOOL", voters: 454 },
+        { name: "GITIE PRIMARY SCHOOL", voters: 636 },
+        { name: "CIANTHIA PRIMARY SCHOOL", voters: 459 },
+        { name: "NGUNYUMU PRIMARY SCHOOL", voters: 607 },
+        { name: "KATHIGAGACERU PRIMARY SCHOOL", voters: 364 },
+        { name: "KATHAGUTARI PRIMARY SCHOOL (Stream 1)", voters: 381 },
+        { name: "KATHAGUTARI PRIMARY SCHOOL (Stream 2)", voters: 380 },
+        { name: "IBUTUKA PRIMARY SCHOOL", voters: 396 },
+        { name: "KUI PRIMARY SCHOOL", voters: 366 },
+        { name: "KARUARI PRIMARY SCHOOL (Stream 1)", voters: 417 },
+        { name: "KARUARI PRIMARY SCHOOL (Stream 2)", voters: 417 },
+        { name: "KIGWAMBITI PRIMARY SCHOOL", voters: 547 },
+        { name: "KIENIRE PRIMARY SCHOOL", voters: 646 },
+        { name: "KAMUKANYA PRIMARY SCHOOL", voters: 370 },
+        { name: "NTAMBARI PRIMARY SCHOOL", voters: 439 },
+        { name: "NGOCE PRIMARY SCHOOL", voters: 649 },
+        { name: "KIRIGO PRIMARY SCHOOL", voters: 423 },
+        { name: "NGARWERERI PRIMARY SCHOOL", voters: 323 },
+        { name: "MUTIRIAIGURU PRIMARY SCHOOL", voters: 325 },
+        { name: "KIANJERU PRIMARY SCHOOL", voters: 464 },
+        { name: "KARANGARE PRIMARY SCHOOL", voters: 552 },
+        { name: "CIANGERA PRIMARY SCHOOL (Stream 1)", voters: 443 },
+        { name: "CIANGERA PRIMARY SCHOOL (Stream 2)", voters: 442 },
+        { name: "NJARANGE PRIMARY SCHOOL", voters: 550 },
+        { name: "MBARAGA PRIMARY SCHOOL", voters: 417 },
+        { name: "MUTHANTHARA PRIMARY SCHOOL", voters: 530 },
+        { name: "KOGARI PRIMARY SCHOOL", voters: 523 },
+        { name: "KAMUTU PRIMARY SCHOOL", voters: 427 },
+        { name: "NTHIGIRANI PRIMARY SCHOOL", voters: 347 },
+        { name: "GATATHA PRIMARY SCHOOL", voters: 424 },
+        { name: "KIATHAMBU PRIMARY SCHOOL", voters: 392 },
+        { name: "KAMWAA PRIMARY SCHOOL", voters: 536 },
+        { name: "KIANTHENGE PRIMARY SCHOOL", voters: 462 },
+        { name: "GWAKAITHI PRIMARY SCHOOL (Stream 1)", voters: 386 },
+        { name: "GWAKAITHI PRIMARY SCHOOL (Stream 2)", voters: 385 },
+        { name: "RWANJERU PRIMARY SCHOOL", voters: 239 },
+        { name: "GATORORORI PRIMARY SCHOOL", voters: 343 },
+        { name: "OVARIRE PRIMARY SCHOOL", voters: 276 },
+        { name: "MANGOTE PRIMARY SCHOOL", voters: 260 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 1)", voters: 653 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 2)", voters: 652 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 3)", voters: 652 },
+        { name: "KANYUERI PRIMARY SCHOOL", voters: 315 },
+        { name: "ST. MARYS KANGANGA PRIMARY SCHOOL", voters: 408 },
+        { name: "ITURURI PRIMARY SCHOOL", voters: 370 },
+        { name: "USAMBARA PRIMARY SCHOOL", voters: 310 },
+        { name: "MUGWANJOGU PRIMARY SCHOOL", voters: 252 },
+        { name: "MBACI PRIMARY SCHOOL", voters: 259 },
+        { name: "KAMARINDO PRIMARY SCHOOL", voters: 284 },
+        { name: "KARIGIRI PRIMARY SCHOOL (Stream 1)", voters: 425 },
+        { name: "KARIGIRI PRIMARY SCHOOL (Stream 2)", voters: 425 },
+        { name: "ST. KIZITO KATHANGARI PR SCHOOL", voters: 628 },
+        { name: "MURANGU PRIMARY SCHOOL", voters: 125 },
+        { name: "CIAIKUNGUGU PRIMARY SCHOOL", voters: 127 },
+        { name: "KAMBUNGU PRIMARY SCHOOL", voters: 218 },
+        { name: "KAMIGUA PRIMARY SCHOOL", voters: 251 },
+        { name: "ST. MICHAEL GACURIRI PR SCHOOL", voters: 171 },
+        { name: "KANYANGI PRIMARY SCHOOL", voters: 23 },
+        { name: "KAMAUA PRIMARY SCHOOL", voters: 27 },
+        { name: "KATHERU PRIMARY SCHOOL", voters: 13 },
+        { name: "KIANJOYA PRIMARY SCHOOL", voters: 11 },
+        { name: "KAMARANDI SECONDARY SCHOOL", voters: 16 }
+    ];
+
+    // Calculate Evurore total voters
+    const EVURORE_TOTAL_VOTERS = EVURORE_STATIONS.reduce((sum, s) => sum + s.voters, 0);
+
+    // Muminji Candidates (7)
+    const MUMINJI_CANDIDATES = [
+        { short: "Ngari B.", full: "Ngari Boniface Kariuki", party: "" },
+        { short: "Ngari J.", full: "Ngari John Nyaga", party: "" },
+        { short: "Njeru C.", full: "Njeru Cosmas", party: "" },
+        { short: "Njiru J.", full: "Njiru Joseph Ngari", party: "" },
+        { short: "Njiru P.", full: "Njiru Peterson Njeru", party: "" },
+        { short: "Njuki C.", full: "Njuki Charles Kiura", party: "" },
+        { short: "Nthinga Z.", full: "Nthinga Zachary Mbogo", party: "" }
+    ];
+
+    // Evurore Candidates (5 with parties)
+    const EVURORE_CANDIDATES = [
+        { short: "Catherine K.", full: "Catherine Mururi Kabuthi", party: "UPA" },
+        { short: "Albert K.", full: "Albert Muchira Kigoro", party: "DP" },
+        { short: "Johnson M.", full: "Johnson Mukui Mate", party: "IND" },
+        { short: "Martin M.", full: "Martin Mukundi Muriithi", party: "NEDP" },
+        { short: "Joseph N.", full: "Joseph Nyaga Njeru", party: "PLP" }
+    ];
+
+    // DOM elements
+    const tableBody = document.getElementById('tableBody');
+    const tableHeader = document.getElementById('tableHeader');
+    const candidateTotalsBody = document.getElementById('candidateTotalsBody');
+    const filterSelect = document.getElementById('filterStation');
+    const sortBy = document.getElementById('sortBy');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    const downloadCSV = document.getElementById('downloadCSV');
+    const totalVotesCast = document.getElementById('totalVotesCast');
+    const totalRejected = document.getElementById('totalRejected');
+    const turnoutPct = document.getElementById('turnoutPct');
+    const stationsCount = document.getElementById('stationsCount');
+    const leadingCandidate = document.getElementById('leadingCandidate');
+    const totalRegisteredBadge = document.getElementById('totalRegisteredBadge');
+    const stationsInfo = document.getElementById('stationsInfo');
+    const wardNameDisplay = document.getElementById('wardNameDisplay');
+    const wardStationsName = document.getElementById('wardStationsName');
+
+    // Ward buttons
+    const wardMuminjiBtn = document.getElementById('wardMuminjiBtn');
+    const wardEvuroreBtn = document.getElementById('wardEvuroreBtn');
+
+    // Live indicator elements
+    const liveDot = document.getElementById('liveDot');
+    const liveText = document.getElementById('liveText');
+    const adminStatusBadge = document.getElementById('adminStatusBadge');
+
+    // State
+    let currentWard = 'muminji';
+    let firebaseDocs = [];
+    let allStations = [];
+    let adminStreamingActive = true;
+
+    // Update LIVE indicator
+    function updateLiveIndicator() {
+        if (adminStreamingActive) {
+            liveDot.className = 'live-dot';
+            liveText.innerText = 'LIVE';
+            adminStatusBadge.innerText = 'results streaming';
+            adminStatusBadge.style.background = '#f97316';
+        } else {
+            liveDot.className = 'live-dot inactive';
+            liveText.innerText = 'STANDBY';
+            adminStatusBadge.innerText = 'admin paused';
+            adminStatusBadge.style.background = '#64748b';
+        }
+    }
+
+    // Simulate admin changing status every 12 seconds
+    setInterval(() => {
+        adminStreamingActive = !adminStreamingActive;
+        updateLiveIndicator();
+    }, 12000);
+
+    // Helper: generate station ID
+    function generateStationId(name, ward) {
+        return ward + "_" + name.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, '');
+    }
+
+    // Get current stations based on ward
+    function getCurrentStations() {
+        return currentWard === 'muminji' ? MUMINJI_STATIONS : EVURORE_STATIONS;
+    }
+
+    // Get current candidates based on ward
+    function getCurrentCandidates() {
+        return currentWard === 'muminji' ? MUMINJI_CANDIDATES : EVURORE_CANDIDATES;
+    }
+
+    // Get total registered voters for current ward
+    function getTotalRegistered() {
+        return currentWard === 'muminji' ? 9849 : EVURORE_TOTAL_VOTERS;
+    }
+
+    // Update header based on ward
+    function updateWardHeader() {
+        const totalReg = getTotalRegistered();
+        const stations = getCurrentStations();
+        
+        totalRegisteredBadge.innerText = `${totalReg.toLocaleString()} registered`;
+        stationsInfo.innerText = `📍 ${stations.length} polling stations`;
+        wardNameDisplay.innerText = currentWard === 'muminji' ? 'Muminji Ward' : 'Evurore Ward';
+        wardStationsName.innerText = currentWard === 'muminji' ? 'Muminji Ward' : 'Evurore Ward';
+        
+        // Update button active states
+        if (currentWard === 'muminji') {
+            wardMuminjiBtn.classList.add('active');
+            wardEvuroreBtn.classList.remove('active');
+        } else {
+            wardEvuroreBtn.classList.add('active');
+            wardMuminjiBtn.classList.remove('active');
+        }
+        
+        // Re-render with new ward data
+        mergeData();
+    }
+
+    // Ward button listeners
+    wardMuminjiBtn.addEventListener('click', () => {
+        if (currentWard === 'muminji') return;
+        currentWard = 'muminji';
+        updateWardHeader();
+    });
+
+    wardEvuroreBtn.addEventListener('click', () => {
+        if (currentWard === 'evurore') return;
+        currentWard = 'evurore';
+        updateWardHeader();
+    });
+
+    // Fetch data from Firebase
+    async function fetchData() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "pollingStations"));
+            firebaseDocs = [];
+            querySnapshot.forEach(doc => {
+                firebaseDocs.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(`Fetched ${firebaseDocs.length} documents`);
+            mergeData();
+        } catch (error) {
+            console.error("Error fetching:", error);
+            firebaseDocs = [];
+            mergeData();
+        }
+    }
+
+    // Merge with master stations
+    function mergeData() {
+        const currentStations = getCurrentStations();
+        
+        allStations = currentStations.map(station => {
+            const stationId = generateStationId(station.name, currentWard);
+            // Find matching Firebase doc for this ward
+            const fbMatch = firebaseDocs.find(doc => 
+                doc.id === stationId || 
+                (doc.stationName && doc.ward && doc.ward.toLowerCase() === currentWard && 
+                 doc.stationName === station.name)
+            );
+            
+            return {
+                ...station,
+                firebase: fbMatch || null,
+                reported: !!fbMatch,
+                stationId: stationId
+            };
+        });
+        
+        renderTable();
+        renderCandidateTotals();
+        updateFilterDropdown();
+    }
+
+    // Render table header dynamically
+    function renderTableHeader() {
+        const candidates = getCurrentCandidates();
+        let headerHtml = `
+            <tr>
+                <th rowspan="2">Station</th>
+                <th rowspan="2">Reg Voters</th>
+                <th rowspan="2">Casted</th>
+                <th rowspan="2">Rej</th>
+                <th rowspan="2">Turnout %</th>
+                <th colspan="${candidates.length}">Votes per Candidate</th>
+                <th rowspan="2">Winner</th>
+                <th rowspan="2">Margin</th>
+                <th rowspan="2">PSV (%)</th>
+                <th rowspan="2">Irregularities</th>
+            </tr>
+            <tr>
+        `;
+        
+        candidates.forEach(c => {
+            headerHtml += `<th>${c.short}</th>`;
+        });
+        
+        headerHtml += `</tr>`;
+        tableHeader.innerHTML = headerHtml;
+    }
+
+    // Render main table
+    function renderTable() {
+        renderTableHeader();
+        
+        const filter = filterSelect.value;
+        const sort = sortBy.value;
+        const candidates = getCurrentCandidates();
+        
+        let filtered = [...allStations];
+        if (filter !== 'all') {
+            filtered = filtered.filter(s => s.stationId === filter || s.name === filter);
+        }
+        
+        // Sort
+        filtered.sort((a, b) => {
+            if (sort === 'name') return a.name.localeCompare(b.name);
+            if (sort === 'turnout') {
+                const aTurnout = a.reported ? (a.firebase.castedVotes / a.voters * 100) : 0;
+                const bTurnout = b.reported ? (b.firebase.castedVotes / b.voters * 100) : 0;
+                return bTurnout - aTurnout;
+            }
+            if (sort === 'discrepancy') {
+                const aDisc = a.reported && a.firebase.discrepancyDetected ? 1 : 0;
+                const bDisc = b.reported && b.firebase.discrepancyDetected ? 1 : 0;
+                return bDisc - aDisc;
+            }
+            return 0;
+        });
+        
+        // Update count
+        const reportedCount = allStations.filter(s => s.reported).length;
+        const totalStations = getCurrentStations().length;
+        stationsCount.innerText = `${reportedCount}/${totalStations} stations reported`;
+        
+        // Calculate totals
+        let totalCasted = 0, totalRej = 0, totalRegReported = 0;
+        allStations.forEach(s => {
+            if (s.reported) {
+                totalCasted += Number(s.firebase.castedVotes) || 0;
+                totalRej += Number(s.firebase.rejectedVotes) || 0;
+                totalRegReported += s.voters;
+            }
+        });
+        totalVotesCast.innerText = totalCasted.toLocaleString();
+        totalRejected.innerText = totalRej.toLocaleString();
+        const turnout = totalRegReported > 0 ? ((totalCasted / totalRegReported) * 100).toFixed(1) : 0;
+        turnoutPct.innerText = turnout + '%';
+        
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="${8 + candidates.length}" style="padding:40px;">No stations match filter</td></tr>`;
+            return;
+        }
+        
+        let html = '';
+        filtered.forEach(station => {
+            const fb = station.firebase;
+            const reported = station.reported;
+            
+            if (!reported) {
+                // Pending station
+                html += `<tr style="opacity:0.7;">
+                    <td class="station-name">${station.name} ⏳</td>
+                    <td>${station.voters}</td>
+                    <td>—</td><td>—</td><td>—</td>
+                    ${candidates.map(() => '<td>—</td>').join('')}
+                    <td>—</td><td>—</td><td>—</td>
+                    <td><span style="background:#fff2d6; padding:2px 8px; border-radius:20px;">pending</span></td>
+                </tr>`;
+                return;
+            }
+            
+            // Get votes for each candidate (prefer IEBC)
+            const agentVotes = fb.agentVotes || {};
+            const iebcVotes = fb.iebcVotes || {};
+            
+            const votes = candidates.map(c => {
+                return Number(iebcVotes[c.full] || agentVotes[c.full] || 0);
+            });
+            
+            const casted = Number(fb.castedVotes) || 0;
+            const rejected = Number(fb.rejectedVotes) || 0;
+            const turnout = station.voters > 0 ? ((casted / station.voters) * 100).toFixed(1) : '0.0';
+            
+            // Find winner and margin
+            let maxVotes = Math.max(...votes);
+            let winnerIndex = votes.indexOf(maxVotes);
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
+            
+            // Find runner-up
+            let sortedVotes = [...votes].sort((a,b) => b - a);
+            let runnerUp = sortedVotes[1] || 0;
+            let margin = maxVotes - runnerUp;
+            
+            // PSV (winner % of casted)
+            let psv = casted > 0 ? ((maxVotes / casted) * 100).toFixed(1) : '0.0';
+            
+            // Irregularities
+            const hasDiscrepancy = fb.discrepancyDetected || false;
+            const irregularityNote = hasDiscrepancy ? '⚠️ Mismatch' : '';
+            
+            html += `<tr ${hasDiscrepancy ? 'class="irregularity-cell"' : ''}>
+                <td class="station-name">${station.name}</td>
+                <td>${station.voters}</td>
+                <td>${casted}</td>
+                <td>${rejected}</td>
+                <td>${turnout}%</td>
+                ${votes.map(v => `<td class="${v === maxVotes ? 'winner-cell' : ''}">${v}</td>`).join('')}
+                <td><strong>${winnerName}</strong></td>
+                <td>${margin}</td>
+                <td class="psv-cell">${psv}%</td>
+                <td>${irregularityNote}</td>
+            </tr>`;
+        });
+        
+        tableBody.innerHTML = html;
+    }
+
+    // Render candidate totals
+    function renderCandidateTotals() {
+        const candidates = getCurrentCandidates();
+        const currentStations = allStations;
+        
+        // Calculate totals
+        let totals = {};
+        let agentTotals = {};
+        candidates.forEach(c => {
+            totals[c.full] = 0;
+            agentTotals[c.full] = 0;
+        });
+        
+        let stationsWon = {};
+        candidates.forEach(c => stationsWon[c.full] = 0);
+        
+        let totalCasted = 0;
+        
+        currentStations.forEach(station => {
+            if (!station.reported) return;
+            
+            const fb = station.firebase;
+            const iebcVotes = fb.iebcVotes || {};
+            const agentVotes = fb.agentVotes || {};
+            
+            // Count votes
+            let stationVotes = [];
+            candidates.forEach((c, idx) => {
+                const iebcVote = Number(iebcVotes[c.full] || 0);
+                const agentVote = Number(agentVotes[c.full] || 0);
+                totals[c.full] += iebcVote;
+                agentTotals[c.full] += agentVote;
+                stationVotes.push(iebcVote);
+            });
+            
+            // Determine winner for this station
+            let maxVotes = Math.max(...stationVotes);
+            let winnerIdx = stationVotes.indexOf(maxVotes);
+            if (winnerIdx >= 0) {
+                stationsWon[candidates[winnerIdx].full] += 1;
+            }
+            
+            totalCasted += Number(fb.castedVotes) || 0;
+        });
+        
+        // Create array for sorting
+        let candidateArray = candidates.map(c => ({
+            short: c.short,
+            full: c.full,
+            party: c.party || '',
+            votes: totals[c.full] || 0,
+            agentVotes: agentTotals[c.full] || 0,
+            psv: totalCasted > 0 ? ((totals[c.full] / totalCasted) * 100).toFixed(1) : '0.0',
+            won: stationsWon[c.full] || 0
+        })).sort((a, b) => b.votes - a.votes);
+        
+        // Find leading candidate
+        if (candidateArray.length > 0 && candidateArray[0].votes > 0) {
+            leadingCandidate.innerText = `${candidateArray[0].short} leading`;
+        } else {
+            leadingCandidate.innerText = 'No data yet';
+        }
+        
+        // Calculate margins
+        let html = '';
+        candidateArray.forEach((cand, index) => {
+            const rankClass = index === 0 ? 'rank-1' : '';
+            const margin = index === 0 ? (cand.votes - (candidateArray[1]?.votes || 0)) : (candidateArray[0].votes - cand.votes);
+            
+            // Calculate IEBC vs Agent difference
+            const diff = cand.votes - cand.agentVotes;
+            const diffText = diff === 0 ? '✓ Match' : (diff > 0 ? `+${diff}` : diff);
+            const diffClass = diff === 0 ? '' : (diff > 0 ? 'positive' : 'negative');
+            
+            html += `<tr class="${rankClass}">
+                <td><strong>${cand.short}</strong></td>
+                <td>${cand.party ? `<span style="background:#e6f0ff; padding:2px 8px; border-radius:12px;">${cand.party}</span>` : '—'}</td>
+                <td><strong>${cand.votes.toLocaleString()}</strong></td>
+                <td>${cand.psv}% 
+                    <span class="progress-bar">
+                        <span class="progress-fill" style="width: ${cand.psv}%"></span>
+                    </span>
+                </td>
+                <td>${cand.won} station${cand.won !== 1 ? 's' : ''}</td>
+                <td>${index === 0 ? '+' + margin : '-' + Math.abs(margin)}</td>
+                <td style="color: ${diff === 0 ? '#166534' : (diff > 0 ? '#b45309' : '#991b1b')}">
+                    ${diffText}
+                </td>
+            </tr>`;
+        });
+        
+        candidateTotalsBody.innerHTML = html;
+    }
+
+    // Update filter dropdown with stations
+    function updateFilterDropdown() {
+        filterSelect.innerHTML = '<option value="all">All polling stations</option>';
+        allStations.forEach(station => {
+            const opt = document.createElement('option');
+            opt.value = station.stationId;
+            opt.textContent = station.name;
+            filterSelect.appendChild(opt);
+        });
+    }
+
+    // Download data as CSV
+    function downloadData() {
+        const candidates = getCurrentCandidates();
+        let csv = '';
+        
+        // Add header
+        csv += 'Station,Registered,Casted,Rejected,Turnout %,';
+        candidates.forEach(c => csv += `${c.short},`);
+        csv += 'Winner,Margin,PSV %,Irregularities\n';
+        
+        // Add rows
+        allStations.forEach(station => {
+            if (!station.reported) return;
+            
+            const fb = station.firebase;
+            const agentVotes = fb.agentVotes || {};
+            const iebcVotes = fb.iebcVotes || {};
+            
+            const votes = candidates.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
+            const casted = Number(fb.castedVotes) || 0;
+            const rejected = Number(fb.rejectedVotes) || 0;
+            const turnout = station.voters > 0 ? ((casted / station.voters) * 100).toFixed(1) : '0.0';
+            
+            let maxVotes = Math.max(...votes);
+            let winnerIndex = votes.indexOf(maxVotes);
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
+            
+            let sortedVotes = [...votes].sort((a,b) => b - a);
+            let margin = maxVotes - (sortedVotes[1] || 0);
+            let psv = casted > 0 ? ((maxVotes / casted) * 100).toFixed(1) : '0.0';
+            
+            csv += `"${station.name}",${station.voters},${casted},${rejected},${turnout}%,`;
+            csv += votes.join(',') + ',';
+            csv += `${winnerName},${margin},${psv}%,${fb.discrepancyDetected ? 'Mismatch' : ''}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentWard}_results_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+    }
+
+    // Generate PDF
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape', 'mm', 'a4');
+        const candidates = getCurrentCandidates();
+        const wardName = currentWard === 'muminji' ? 'Muminji' : 'Evurore';
+        const totalReg = getTotalRegistered();
+        const reportedCount = allStations.filter(s => s.reported).length;
+        const totalStations = getCurrentStations().length;
+        
+        // Title
+        doc.setFontSize(18);
+        doc.text(`${wardName} Ward - Final Results`, 14, 15);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 22);
+        doc.text(`Total Registered: ${totalReg.toLocaleString()} | Stations Reported: ${reportedCount}/${totalStations}`, 14, 28);
+        
+        // Candidate totals table
+        const candidateData = [];
+        let totalCasted = 0;
+        allStations.forEach(s => { if(s.reported) totalCasted += Number(s.firebase?.castedVotes) || 0; });
+        
+        candidates.forEach(c => {
+            let total = 0;
+            allStations.forEach(s => {
+                if(s.reported) {
+                    const fb = s.firebase;
+                    total += Number(fb?.iebcVotes?.[c.full] || fb?.agentVotes?.[c.full] || 0);
+                }
+            });
+            const psv = totalCasted > 0 ? ((total / totalCasted) * 100).toFixed(1) : '0.0';
+            candidateData.push([c.short, total.toLocaleString(), psv + '%']);
+        });
+        
+        doc.autoTable({
+            startY: 32,
+            head: [['Candidate', 'Total Votes', 'PSV']],
+            body: candidateData,
+            theme: 'striped',
+            headStyles: { fillColor: [15, 59, 106] }
+        });
+        
+        // Per-station table
+        const tableData = [];
+        allStations.forEach(station => {
+            if (!station.reported) return;
+            
+            const fb = station.firebase;
+            const agentVotes = fb.agentVotes || {};
+            const iebcVotes = fb.iebcVotes || {};
+            
+            const votes = candidates.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
+            const casted = Number(fb.castedVotes) || 0;
+            const rejected = Number(fb.rejectedVotes) || 0;
+            const turnout = station.voters > 0 ? ((casted / station.voters) * 100).toFixed(1) : '0.0';
+            
+            let maxVotes = Math.max(...votes);
+            let winnerIndex = votes.indexOf(maxVotes);
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
+            
+            let sortedVotes = [...votes].sort((a,b) => b - a);
+            let margin = maxVotes - (sortedVotes[1] || 0);
+            let psv = casted > 0 ? ((maxVotes / casted) * 100).toFixed(1) : '0.0';
+            
+            tableData.push([
+                station.name,
+                station.voters,
+                casted,
+                rejected,
+                turnout + '%',
+                ...votes,
+                winnerName,
+                margin,
+                psv + '%',
+                fb.discrepancyDetected ? 'Mismatch' : ''
+            ]);
+        });
+        
+        const headers = [
+            'Station', 'Reg', 'Casted', 'Rej', 'Turnout',
+            ...candidates.map(c => c.short),
+            'Winner', 'Margin', 'PSV', 'Irregularities'
+        ];
+        
+        doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 10,
+            head: [headers],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [15, 59, 106] },
+            styles: { fontSize: 8 },
+            columnStyles: { 0: { cellWidth: 40 } }
+        });
+        
+        doc.save(`${wardName}_results_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+
+    // Event listeners
+    filterSelect.addEventListener('change', renderTable);
+    sortBy.addEventListener('change', renderTable);
+    refreshBtn.addEventListener('click', () => fetchData());
+    downloadCSV.addEventListener('click', downloadData);
+    downloadPdfBtn.addEventListener('click', generatePDF);
+
+    // Initial load
+    updateLiveIndicator();
+    updateWardHeader();
+    fetchData();
+</script>
+</body>
+</html>
