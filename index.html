@@ -792,11 +792,10 @@ import { getFirestore, collection, getDocs, query, where, onSnapshot } from "htt
 
 // Your existing code - replace hardcoded config with:
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
+    apiKey: "AIzaSyCJEJGa_GBufklAc7gl9-TjjBbpxao7_J8",
+    authDomain: "tallying-9df93.firebaseapp.com",
+    projectId: "tallying-9df93"
 };
-    
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
