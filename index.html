@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muminji & Evurore Wards – Live Election Results with Candidate Photos</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8;
+    padding: 0;
+    margin: 0;
+    color: #1e293b;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #0a2a44, #1a4f89);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Navigation */
+.main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0 10px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active {
+    background: white;
+    color: #0a2a44;
+    border-color: white;
+}
+
+.nav-btn.admin-btn {
+    background: #f97316;
+    border-color: #f97316;
+}
+
+.nav-btn.admin-btn:hover {
+    background: #fb923c;
+    border-color: #fb923c;
+}
+
+.live-badge {
+    background: #dc2626;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 15px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.live-dot {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    display: inline-block;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* Main container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Last updated */
+.last-updated {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.timestamp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+}
+
+.refresh-btn {
+    background: #e6f0ff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    color: #0f3b6a;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background: #d0e2ff;
+    transform: scale(1.02);
+}
+
+.refresh-btn:active {
+    transform: scale(0.98);
+}
+
+/* Ward Tabs */
+.ward-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.ward-tab {
+    padding: 16px 30px;
+    border: none;
+    background: white;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.ward-tab.active {
+    background: #0f3b6a;
+    color: white;
+    border-color: #0f3b6a;
+}
+
+.ward-tab:not(.active):hover {
+    border-color: #a0b3cc;
+    background: #f8fafd;
+}
+
+.ward-tab .count {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+}
+
+.ward-tab.active .count {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0f3b6a;
+    line-height: 1.2;
+}
+
+.stat-sub {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Progress bar */
+.progress-container {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.progress-bar {
+    height: 20px;
+    background: #e2e8f0;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0f3b6a, #2c7be5);
+    border-radius: 30px;
+    transition: width 0.5s ease;
+    color: white;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+/* Enhanced Candidate cards with profile photos */
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.candidate-card {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    border: 1px solid #e9eef3;
+    transition: all 0.3s;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+}
+
+.candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(15,59,106,0.15);
+    border-color: #0f3b6a;
+}
+
+.candidate-photo-header {
+    height: 120px;
+    background: linear-gradient(135deg, #0f3b6a, #2c7be5);
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.candidate-profile-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: #e6f0ff;
+    position: absolute;
+    bottom: -40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0f3b6a;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    object-fit: cover;
+}
+
+.candidate-info {
+    margin-top: 60px;
+    padding: 20px 20px 15px;
+    text-align: center;
+    border-bottom: 1px solid #edf2f9;
+}
+
+.candidate-info h3 {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    color: #0b2d4b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ranking-badge {
+    display: inline-block;
+    background: #0f3b6a;
+    color: white;
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.candidate-party-badge {
+    display: inline-block;
+    background: #e6f0ff;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f3b6a;
+    margin-top: 5px;
+}
+
+/* Vote comparison */
+.vote-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 20px;
+    background: #f8fafd;
+}
+
+.vote-box {
+    text-align: center;
+    padding: 15px 8px;
+    border-radius: 16px;
+    transition: transform 0.2s;
+}
+
+.vote-box:hover {
+    transform: scale(1.02);
+}
+
+.vote-box.agent {
+    background: #e6f0ff;
+    border-bottom: 4px solid #0f3b6a;
+}
+
+.vote-box.iebc {
+    background: #e8f7ef;
+    border-bottom: 4px solid #166534;
+}
+
+.vote-box.diff {
+    background: #fef3c7;
+    border-bottom: 4px solid #92400e;
+}
+
+.vote-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vote-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.vote-box.agent .vote-number {
+    color: #0f3b6a;
+}
+
+.vote-box.iebc .vote-number {
+    color: #166534;
+}
+
+.diff-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.diff-number.positive {
+    color: #166534;
+}
+
+.diff-number.negative {
+    color: #991b1b;
+}
+
+.diff-number.zero {
+    color: #64748b;
+}
+
+.vote-percentage {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+/* Stats footer */
+.candidate-stats-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: white;
+    border-top: 1px solid #edf2f9;
+    font-size: 0.9rem;
+    color: #4a627a;
+}
+
+.candidate-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.candidate-stat-value {
+    font-weight: 700;
+    color: #0f3b6a;
+}
+
+/* Stations table */
+.results-section {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0f3b6a;
+}
+
+.stations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.stations-table th {
+    text-align: left;
+    padding: 12px 10px;
+    background: #f8fafd;
+    color: #364d6b;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.stations-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #edf2f9;
+}
+
+.station-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.station-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-submitted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.votes-cell {
+    font-weight: 600;
+    color: #0f3b6a;
+}
+
+.discrepancy-badge {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Serial number badge */
+.serial-badge {
+    background: #e6f0ff;
+    color: #0f3b6a;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-left: 8px;
+    border: 1px solid #a0b3cc;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e6f0ff;
+    border-top-color: #0f3b6a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 40px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .ward-tab {
+        min-width: 100%;
+    }
+    
+    .stations-table {
+        font-size: 0.8rem;
+    }
+    
+    .vote-comparison {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .candidate-profile-img {
+        width: 90px;
+        height: 90px;
+        font-size: 2rem;
+    }
+    
+    .main-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>
+        <span>🗳️</span>
+        Muminji & Evurore Wards
+        <span>🗳️</span>
+    </h1>
+    <p>Live Election Results Portal • Candidate Profiles • IEBC Official Tallying Centre</p>
+    
+    <!-- Navigation to other pages -->
+    <div class="main-nav">
+        <a href="live.html" class="nav-btn active">
+            <span>📊</span> Tabulated Data
+        </a>
+        <a href="admin.html" class="nav-btn admin-btn">
+            <span>🔐</span> Admin Panel (Secured)
+        </a>
+        <a href="live2.html" class="nav-btn">
+            <span>📍</span> Per-Station Results
+        </a>
+    </div>
+    
+    <div class="live-badge">
+        <span class="live-dot"></span>
+        LIVE - Auto refreshes every 30 seconds
+    </div>
+</div>
+
+<div class="container">
+    <!-- Last Updated -->
+    <div class="last-updated">
+        <div class="timestamp">
+            <span>🕒</span>
+            <span id="lastUpdated">Loading...</span>
+        </div>
+        <button class="refresh-btn" id="manualRefreshBtn">
+            <span>🔄</span>
+            Refresh Now
+        </button>
+    </div>
+
+    <!-- Ward Tabs -->
+    <div class="ward-tabs">
+        <button class="ward-tab active" id="tabMuminji">
+            <span>🗳️</span>
+            Muminji Ward
+            <span class="count" id="muminjiCount">0/26</span>
+        </button>
+        <button class="ward-tab" id="tabEvurore">
+            <span>🗳️</span>
+            Evurore Ward
+            <span class="count" id="evuroreCount">0/67</span>
+        </button>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label"><span>📊</span> Total Registered</div>
+            <div class="stat-value" id="totalRegistered">0</div>
+            <div class="stat-sub">voters</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label"><span>✅</span> Votes Cast</div>
+            <div class="stat-value" id="totalVotesCast">0</div>
+            <div class="stat-sub" id="voterTurnout">0% turnout</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label"><span>📋</span> Stations Reported</div>
+            <div class="stat-value" id="stationsReported">0</div>
+            <div class="stat-sub" id="stationsTotal">/0 stations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label"><span>⚠️</span> Discrepancies</div>
+            <div class="stat-value" id="discrepanciesCount">0</div>
+            <div class="stat-sub">stations with mismatches</div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-header">
+            <span>Reporting Progress</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Fetching latest results...</p>
+    </div>
+
+    <!-- Results Content (hidden while loading) -->
+    <div id="resultsContent" style="display: none;">
+        <!-- Candidates Section with Profile Photos -->
+        <div class="results-section">
+            <h2 class="section-title">
+                <span>🏆</span>
+                Candidate Rankings with Profile Photos - <span id="wardNameDisplay">Muminji Ward</span>
+            </h2>
+            <div id="candidatesGrid" class="candidates-grid">
+                <!-- Dynamically populated with candidate profile photos -->
+            </div>
+        </div>
+
+        <!-- Polling Stations -->
+        <div class="results-section">
+            <h2 class="section-title">
+                <span>📍</span>
+                Polling Stations - <span id="stationWardName">Muminji Ward</span>
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="stations-table" id="stationsTable">
+                    <thead>
+                        <tr>
+                            <th>Station Name</th>
+                            <th>Serial No.</th>
+                            <th>Registered</th>
+                            <th>Votes Cast</th>
+                            <th>Rejected</th>
+                            <th>Status</th>
+                            <th>Discrepancy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stationsBody">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© IEBC - Independent Electoral and Boundaries Commission | Official Results Portal</p>
+    <p>Data updates automatically every 30 seconds • Last sync: <span id="footerTimestamp">-</span></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCJEJGa_GBufklAc7gl9-TjjBbpxao7_J8",
+    authDomain: "tallying-9df93.firebaseapp.com",
+    projectId: "tallying-9df93"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// DOM Elements
+const loadingIndicator = document.getElementById('loadingIndicator');
+const resultsContent = document.getElementById('resultsContent');
+const lastUpdatedSpan = document.getElementById('lastUpdated');
+const footerTimestamp = document.getElementById('footerTimestamp');
+const manualRefreshBtn = document.getElementById('manualRefreshBtn');
+
+const tabMuminji = document.getElementById('tabMuminji');
+const tabEvurore = document.getElementById('tabEvurore');
+const wardNameDisplay = document.getElementById('wardNameDisplay');
+const stationWardName = document.getElementById('stationWardName');
+
+const totalRegistered = document.getElementById('totalRegistered');
+const totalVotesCast = document.getElementById('totalVotesCast');
+const voterTurnout = document.getElementById('voterTurnout');
+const stationsReported = document.getElementById('stationsReported');
+const stationsTotal = document.getElementById('stationsTotal');
+const discrepanciesCount = document.getElementById('discrepanciesCount');
+const progressPercent = document.getElementById('progressPercent');
+const progressFill = document.getElementById('progressFill');
+
+const muminjiCount = document.getElementById('muminjiCount');
+const evuroreCount = document.getElementById('evuroreCount');
+const candidatesGrid = document.getElementById('candidatesGrid');
+const stationsBody = document.getElementById('stationsBody');
+
+// Constants
+const MUMINJI_STATIONS = 26;
+const EVURORE_STATIONS = 67;
+
+// Muminji Candidates with profile images
+const MUMINJI_CANDIDATES = [
+    { 
+        id: "c1", 
+        name: "Ngari Boniface Kariuki", 
+        party: "", 
+        partyCode: "",
+        photo: "boni.png",
+        initials: "NB"
+    },
+    { 
+        id: "c2", 
+        name: "Ngari John Nyaga", 
+        party: "", 
+        partyCode: "",
+        photo: "John.png",
+        initials: "NJ"
+    },
+    { 
+        id: "c3", 
+        name: "Njeru Cosmas", 
+        party: "", 
+        partyCode: "",
+        photo: "cos.png",
+        initials: "NC"
+    },
+    { 
+        id: "c4", 
+        name: "Njiru Joseph Ngari", 
+        party: "", 
+        partyCode: "",
+        photo: "Joseph.png",
+        initials: "JJ"
+    },
+    { 
+        id: "c5", 
+        name: "Njiru Peterson Njeru", 
+        party: "", 
+        partyCode: "",
+        photo: "Peter.png",
+        initials: "PN"
+    },
+    { 
+        id: "c6", 
+        name: "Njuki Charles Kiura", 
+        party: "", 
+        photo:"chali.png",
+        initials: "CK"
+    },
+    { 
+        id: "c7", 
+        name: "Nthinga Zachary Mbogo", 
+        party: "", 
+        partyCode: "",
+        photo: "zac.png",
+        initials: "ZM"
+    }
+];
+
+// Evurore Candidates with profile images and party colors
+const EVURORE_CANDIDATES = [
+    { 
+        id: "e1", 
+        name: "Catherine Mururi Kabuthi", 
+        party: "United Progressive Alliance", 
+        partyCode: "UPA",
+        partyColor: "#dc2626",
+        photo: "cat.png",
+        initials: "CM"
+    },
+    { 
+        id: "e2", 
+        name: "Albert Muchira Kigoro", 
+        party: "Democratic Party", 
+        partyCode: "DP",
+        partyColor: "#2563eb",
+        photo: "alb,png",
+        initials: "AK"
+    },
+    { 
+        id: "e3", 
+        name: "Johnson Mukui Mate", 
+        party: "Independent", 
+        partyCode: "IND",
+        partyColor: "#6b7280",
+        photo: "json.png",
+        initials: "JM"
+    },
+    { 
+        id: "e4", 
+        name: "Martin Mukundi Muriithi", 
+        party: "National Economic Development Party", 
+        partyCode: "NEDP",
+        partyColor: "#16a34a",
+        photo: "mar.png",
+        initials: "MM"
+    },
+    { 
+        id: "e5", 
+        name: "Joseph Nyaga Njeru", 
+        party: "People's Liberation Party", 
+        partyCode: "PLP",
+        partyColor: "#b45309",
+        photo: "nyaga.png",
+        initials: "JN"
+    }
+];
+
+// State
+let currentWard = 'muminji';
+let allStations = [];
+let lastUpdateTime = new Date();
+let refreshInterval;
+
+// Initialize
+async function initialize() {
+    console.log('Initializing public page with candidate profiles...');
+    
+    // Set up real-time listeners
+    setupRealtimeListeners();
+    
+    // Set up auto-refresh every 30 seconds
+    refreshInterval = setInterval(() => {
+        console.log('Auto-refreshing data...');
+        updateTimestamp();
+    }, 30000);
+    
+    // Tab click handlers
+    tabMuminji.addEventListener('click', () => {
+        if (currentWard === 'muminji') return;
+        currentWard = 'muminji';
+        updateTabStyles();
+        renderCurrentWard();
+    });
+    
+    tabEvurore.addEventListener('click', () => {
+        if (currentWard === 'evurore') return;
+        currentWard = 'evurore';
+        updateTabStyles();
+        renderCurrentWard();
+    });
+    
+    // Manual refresh button
+    manualRefreshBtn.addEventListener('click', () => {
+        updateTimestamp();
+        // Visual feedback
+        manualRefreshBtn.style.transform = 'rotate(180deg)';
+        setTimeout(() => {
+            manualRefreshBtn.style.transform = 'rotate(0deg)';
+        }, 300);
+    });
+}
+
+function updateTabStyles() {
+    if (currentWard === 'muminji') {
+        tabMuminji.classList.add('active');
+        tabEvurore.classList.remove('active');
+        wardNameDisplay.textContent = 'Muminji Ward';
+        stationWardName.textContent = 'Muminji Ward';
+    } else {
+        tabEvurore.classList.add('active');
+        tabMuminji.classList.remove('active');
+        wardNameDisplay.textContent = 'Evurore Ward';
+        stationWardName.textContent = 'Evurore Ward';
+    }
+}
+
+function setupRealtimeListeners() {
+    // Listen to all polling stations
+    const stationsRef = collection(db, "pollingStations");
+    
+    onSnapshot(stationsRef, (snapshot) => {
+        console.log('Real-time update received:', snapshot.size, 'stations');
+        
+        allStations = [];
+        snapshot.forEach(doc => {
+            allStations.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        // Update counts in tabs
+        updateStationCounts();
+        
+        // Render current ward
+        renderCurrentWard();
+        
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        resultsContent.style.display = 'block';
+        
+        // Update timestamp
+        updateTimestamp();
+        
+    }, (error) => {
+        console.error('Error in real-time listener:', error);
+        loadingIndicator.innerHTML = `
+            <div style="color: #991b1b;">❌ Error loading data</div>
+            <button onclick="window.location.reload()" style="padding:10px 20px; margin-top:10px;">Retry</button>
+        `;
+    });
+}
+
+function updateStationCounts() {
+    const muminjiSubmitted = allStations.filter(s => s.ward === 'Muminji').length;
+    const evuroreSubmitted = allStations.filter(s => s.ward === 'Evurore').length;
+    
+    muminjiCount.textContent = `${muminjiSubmitted}/${MUMINJI_STATIONS}`;
+    evuroreCount.textContent = `${evuroreSubmitted}/${EVURORE_STATIONS}`;
+}
+
+function renderCurrentWard() {
+    const wardStations = allStations.filter(s => 
+        s.ward && s.ward.toLowerCase() === currentWard
+    );
+    
+    // Update stats
+    updateStats(wardStations);
+    
+    // Render candidates with profile photos
+    renderCandidatesWithProfiles(wardStations);
+    
+    // Render stations table with serial numbers
+    renderStationsTable(wardStations);
+}
+
+function updateStats(wardStations) {
+    const totalRegisteredVoters = currentWard === 'muminji' ? 9849 : 25647;
+    const totalStations = currentWard === 'muminji' ? MUMINJI_STATIONS : EVURORE_STATIONS;
+    
+    // Calculate totals
+    let votesCast = 0;
+    let discrepancies = 0;
+    
+    wardStations.forEach(station => {
+        votesCast += station.castedVotes || 0;
+        if (station.discrepancyDetected) discrepancies++;
+    });
+    
+    const turnout = totalRegisteredVoters > 0 
+        ? ((votesCast / totalRegisteredVoters) * 100).toFixed(1) 
+        : 0;
+    
+    // Update DOM
+    totalRegistered.textContent = totalRegisteredVoters.toLocaleString();
+    totalVotesCast.textContent = votesCast.toLocaleString();
+    voterTurnout.textContent = `${turnout}% turnout`;
+    stationsReported.textContent = wardStations.length;
+    stationsTotal.textContent = `/ ${totalStations} stations`;
+    discrepanciesCount.textContent = discrepancies;
+    
+    // Update progress bar
+    const progress = totalStations > 0 
+        ? ((wardStations.length / totalStations) * 100).toFixed(1) 
+        : 0;
+    progressPercent.textContent = `${progress}%`;
+    progressFill.style.width = `${progress}%`;
+    progressFill.textContent = `${progress}%`;
+}
+
+// Render candidates with profile photos
+function renderCandidatesWithProfiles(wardStations) {
+    const candidates = currentWard === 'muminji' ? MUMINJI_CANDIDATES : EVURORE_CANDIDATES;
+    
+    // Calculate votes per candidate (both agent and IEBC)
+    const candidateTotals = {};
+    candidates.forEach(c => {
+        candidateTotals[c.name] = {
+            agent: 0,
+            iebc: 0,
+            diff: 0,
+            stationsWon: 0
+        };
+    });
+    
+    // Track stations won by each candidate
+    wardStations.forEach(station => {
+        if (station.agentVotes) {
+            Object.entries(station.agentVotes).forEach(([candidate, votes]) => {
+                if (candidateTotals[candidate]) {
+                    candidateTotals[candidate].agent += votes || 0;
+                }
+            });
+        }
+        
+        if (station.iebcVotes) {
+            Object.entries(station.iebcVotes).forEach(([candidate, votes]) => {
+                if (candidateTotals[candidate]) {
+                    candidateTotals[candidate].iebc += votes || 0;
+                }
+            });
+        }
+        
+        // Determine winner for this station
+        if (station.iebcVotes) {
+            let maxVotes = 0;
+            let winner = null;
+            Object.entries(station.iebcVotes).forEach(([candidate, votes]) => {
+                if (votes > maxVotes) {
+                    maxVotes = votes;
+                    winner = candidate;
+                }
+            });
+            if (winner && candidateTotals[winner]) {
+                candidateTotals[winner].stationsWon++;
+            }
+        }
+    });
+    
+    // Calculate differences
+    Object.keys(candidateTotals).forEach(name => {
+        candidateTotals[name].diff = candidateTotals[name].agent - candidateTotals[name].iebc;
+    });
+    
+    // Sort candidates by IEBC votes (descending) for ranking
+    const sortedCandidates = [...candidates].sort((a, b) => 
+        (candidateTotals[b.name]?.iebc || 0) - (candidateTotals[a.name]?.iebc || 0)
+    );
+    
+    // Render
+    candidatesGrid.innerHTML = '';
+    
+    sortedCandidates.forEach((c, index) => {
+        const agent = candidateTotals[c.name]?.agent || 0;
+        const iebc = candidateTotals[c.name]?.iebc || 0;
+        const diff = candidateTotals[c.name]?.diff || 0;
+        const stationsWon = candidateTotals[c.name]?.stationsWon || 0;
+        
+        // Determine diff class
+        let diffClass = 'zero';
+        if (diff > 0) diffClass = 'positive';
+        if (diff < 0) diffClass = 'negative';
+        
+        // Calculate percentages
+        const totalVotes = agent + iebc;
+        const agentPercentage = totalVotes > 0 ? ((agent / totalVotes) * 100).toFixed(1) : 0;
+        const iebcPercentage = totalVotes > 0 ? ((iebc / totalVotes) * 100).toFixed(1) : 0;
+        
+        const card = document.createElement('div');
+        card.className = 'candidate-card';
+        
+        // Use party color for header background if available
+        const headerStyle = c.partyColor ? `background: linear-gradient(135deg, ${c.partyColor}, ${c.partyColor}dd);` : '';
+        
+        card.innerHTML = `
+            <div class="candidate-photo-header" style="${headerStyle}">
+                <img src="${c.photo}" alt="${c.name}" class="candidate-profile-img" onerror="this.src='https://ui-avatars.com/api/?name=${c.initials}&size=200&background=0f3b6a&color=fff'">
+            </div>
+            <div class="candidate-info">
+                <h3>
+                    ${c.name}
+                    <span class="ranking-badge">#${index + 1}</span>
+                </h3>
+                ${c.partyCode ? `<div class="candidate-party-badge" style="background: ${c.partyColor}20; color: ${c.partyColor};">${c.partyCode} · ${c.party}</div>` : ''}
+            </div>
+            <div class="vote-comparison">
+                <div class="vote-box agent">
+                    <div class="vote-label">AGENT</div>
+                    <div class="vote-number">${agent.toLocaleString()}</div>
+                    <div class="vote-percentage">${agentPercentage}%</div>
+                </div>
+                <div class="vote-box iebc">
+                    <div class="vote-label">IEBC</div>
+                    <div class="vote-number">${iebc.toLocaleString()}</div>
+                    <div class="vote-percentage">${iebcPercentage}%</div>
+                </div>
+                <div class="vote-box diff">
+                    <div class="vote-label">DIFFERENCE</div>
+                    <div class="diff-number ${diffClass}">${diff > 0 ? '+' : ''}${diff.toLocaleString()}</div>
+                    <div class="vote-percentage">${Math.abs(diff)} votes</div>
+                </div>
+            </div>
+            <div class="candidate-stats-footer">
+                <div class="candidate-stat-item">
+                    <span>🏆</span>
+                    <span>Stations Won: <strong class="candidate-stat-value">${stationsWon}</strong></span>
+                </div>
+                <div class="candidate-stat-item">
+                    <span>📊</span>
+                    <span>Average: <strong class="candidate-stat-value">${stationsWon > 0 ? Math.round(iebc/stationsWon).toLocaleString() : 0}</strong> per station</span>
+                </div>
+            </div>
+        `;
+        
+        candidatesGrid.appendChild(card);
+    });
+}
+
+// Updated stations table render function with serial numbers
+function renderStationsTable(wardStations) {
+    stationsBody.innerHTML = '';
+    
+    if (wardStations.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="7" style="text-align: center; padding: 40px;">No results reported yet for this ward</td>`;
+        stationsBody.appendChild(row);
+        return;
+    }
+    
+    // Sort by station name
+    const sortedStations = [...wardStations].sort((a, b) => 
+        a.stationName.localeCompare(b.stationName)
+    );
+    
+    sortedStations.forEach(station => {
+        const row = document.createElement('tr');
+        
+        const statusClass = station.submittedAt ? 'status-submitted' : 'status-pending';
+        const statusText = station.submittedAt ? '✓ Reported' : '⏳ Pending';
+        
+        // Format serial number with badge styling
+        const serialNumber = station.formSerialNumber || '—';
+        const serialDisplay = serialNumber !== '—' 
+            ? `<span class="serial-badge">📋 ${serialNumber}</span>` 
+            : serialNumber;
+        
+        row.innerHTML = `
+            <td class="station-name">${station.stationName || 'Unknown'}</td>
+            <td>${serialDisplay}</td>
+            <td class="votes-cell">${station.registeredVoters?.toLocaleString() || 0}</td>
+            <td class="votes-cell">${station.castedVotes?.toLocaleString() || 0}</td>
+            <td>${station.rejectedVotes?.toLocaleString() || 0}</td>
+            <td><span class="station-status ${statusClass}">${statusText}</span></td>
+            <td>
+                ${station.discrepancyDetected 
+                    ? '<span class="discrepancy-badge">⚠️ Mismatch</span>' 
+                    : '<span style="color:#64748b;">✓ Match</span>'}
+            </td>
+        `;
+        
+        stationsBody.appendChild(row);
+    });
+}
+
+function updateTimestamp() {
+    const now = new Date();
+    const formatted = now.toLocaleTimeString() + ' • ' + now.toLocaleDateString();
+    lastUpdatedSpan.textContent = formatted;
+    footerTimestamp.textContent = formatted;
+    lastUpdateTime = now;
+}
+
+// Start the app
+initialize();
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+});
+</script>
+</body>
+</html>
