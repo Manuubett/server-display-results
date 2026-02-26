@@ -316,13 +316,13 @@ body {
     position: relative;
 }
 
-/* Winner highlight */
-.candidate-card.winner {
+/* Leading candidate highlight */
+.candidate-card.leading {
     border: 3px solid #fbbf24;
     box-shadow: 0 8px 25px rgba(251,191,36,0.2);
 }
 
-.winner-crown {
+.leading-badge {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -682,11 +682,11 @@ body.screenshot-mode .header h1 {
     
     <!-- Navigation -->
     <div class="main-nav">
-        <a href="live2.html"nav-btn active">
-            <span>📊</span> Results per pollingStations
+        <a href="live.html"nav-btn active">
+            <span>📊</span> Tabulated data
         </a>
-        <a href="live.html"nav-btn admin-btn">
-            <span>🔐</span> tabulated data
+        <a href="live2.html"nav-btn admin-btn">
+            <span>🔐</span> results Per-Polling
         </a>
     </div>
     
@@ -1186,18 +1186,18 @@ function renderCandidatesWithRankings(wardStations) {
             });
         }
         
-        // Determine winner using AGENT votes
+        // Determine leader for this station using AGENT votes
         if (station.agentVotes) {
             let maxVotes = 0;
-            let winner = null;
+            let leader = null;
             Object.entries(station.agentVotes).forEach(([candidate, votes]) => {
                 if (votes > maxVotes) {
                     maxVotes = votes;
-                    winner = candidate;
+                    leader = candidate;
                 }
             });
-            if (winner && candidateTotals[winner]) {
-                candidateTotals[winner].stationsWon++;
+            if (leader && candidateTotals[leader]) {
+                candidateTotals[leader].stationsWon++;
             }
         }
     });
@@ -1225,7 +1225,7 @@ function renderCandidatesWithRankings(wardStations) {
     candidatesGrid.innerHTML = '';
     
     candidateArray.forEach((cand, index) => {
-        const isWinner = index === 0 && cand.agent > 0;
+        const isLeading = index === 0 && cand.agent > 0;
         const agentPercentage = totalAgentVotes > 0 ? ((cand.agent / totalAgentVotes) * 100).toFixed(1) : 0;
         const iebcPercentage = totalAgentVotes > 0 ? ((cand.iebc / totalAgentVotes) * 100).toFixed(1) : 0;
         
@@ -1234,13 +1234,13 @@ function renderCandidatesWithRankings(wardStations) {
         if (cand.diff < 0) diffClass = 'negative';
         
         const card = document.createElement('div');
-        card.className = `candidate-card ${isWinner ? 'winner' : ''}`;
+        card.className = `candidate-card ${isLeading ? 'leading' : ''}`;
         
         // Create photo URL with fallback to UI Avatars
         const photoUrl = cand.photo || `https://ui-avatars.com/api/?name=${cand.initials}&size=200&background=${cand.partyColor?.replace('#', '') || '0f3b6a'}&color=fff`;
         
         card.innerHTML = `
-            ${isWinner ? '<div class="winner-crown"><span>👑</span> WINNER</div>' : ''}
+            ${isLeading ? '<div class="leading-badge"><span>📈</span> LEADING</div>' : ''}
             <div class="candidate-photo-header" style="background: linear-gradient(135deg, ${cand.partyColor || '#0f3b6a'}, ${cand.partyColor || '#0f3b6a'}dd);">
                 <img src="${photoUrl}" alt="${cand.name}" class="candidate-profile-img" onerror="this.src='https://ui-avatars.com/api/?name=${cand.initials}&size=200&background=${cand.partyColor?.replace('#', '') || '0f3b6a'}&color=fff'">
             </div>
