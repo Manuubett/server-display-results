@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muminji Ward · Final Results Dashboard</title>
+    <title>Muminji & Evurore Wards · Final Results Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -39,6 +39,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
         .ward-badge {
             background: rgba(255,255,255,0.2);
@@ -65,6 +66,33 @@
         .pill-value {
             font-size: 1.8rem;
             font-weight: 700;
+        }
+        /* ward selector */
+        .ward-selector {
+            display: flex;
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 50px;
+            margin-left: 20px;
+        }
+        .ward-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .ward-btn.active {
+            background: white;
+            color: #0b2a4a;
+        }
+        .ward-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.15);
         }
         /* controls */
         .control-panel {
@@ -149,6 +177,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .winner-badge {
             background: #ffd966;
@@ -198,6 +227,16 @@
             height: 100%;
             background: #0f3b6a;
             border-radius: 20px;
+        }
+        .party-badge {
+            background: #e6f0ff;
+            color: #0f3b6a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+            display: inline-block;
         }
         .irregularity-badge {
             background: #fee2e2;
@@ -281,48 +320,43 @@
             gap: 10px;
         }
         /* top navigation */
-.top-nav{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-    margin-top:20px;
-}
-
-.nav-left{
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
-}
-
-.nav-link{
-    text-decoration:none;
-    color:white;
-    background:rgba(255,255,255,0.12);
-    padding:8px 18px;
-    border-radius:40px;
-    font-weight:500;
-    font-size:0.9rem;
-    transition:0.2s;
-}
-
-.nav-link:hover{
-    background:rgba(255,255,255,0.25);
-}
-
-.nav-link.active{
-    background:white;
-    color:#0b2a4a;
-    font-weight:600;
-}
-
-.nav-link.danger{
-    background:rgba(255,80,80,0.3);
-}
-.nav-link.danger:hover{
-    background:rgba(255,80,80,0.5);
-}
+        .top-nav{
+            width:100%;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+            margin-top:20px;
+        }
+        .nav-left{
+            display:flex;
+            gap:14px;
+            flex-wrap:wrap;
+        }
+        .nav-link{
+            text-decoration:none;
+            color:white;
+            background:rgba(255,255,255,0.12);
+            padding:8px 18px;
+            border-radius:40px;
+            font-weight:500;
+            font-size:0.9rem;
+            transition:0.2s;
+        }
+        .nav-link:hover{
+            background:rgba(255,255,255,0.25);
+        }
+        .nav-link.active{
+            background:white;
+            color:#0b2a4a;
+            font-weight:600;
+        }
+        .nav-link.danger{
+            background:rgba(255,80,80,0.3);
+        }
+        .nav-link.danger:hover{
+            background:rgba(255,80,80,0.5);
+        }
     </style>
     <!-- PDF generation library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -334,22 +368,24 @@
     <div class="header">
         <div class="title">
             <h1>
-                🗳️ Muminji Ward Final Results
-                <span class="ward-badge">9,849 registered</span>
+                🗳️ <span id="wardNameDisplay">Muminji Ward</span> Final Results
+                <span class="ward-badge" id="totalRegisteredDisplay">9,849 registered</span>
             </h1>
-            <div style="display:flex; gap:20px; margin-top:8px;">
-                <span>📍 26 polling stations</span>
+            <div style="display:flex; gap:20px; margin-top:8px; flex-wrap:wrap;">
+                <span id="stationsInfo">📍 26 polling stations</span>
                 <span>⚡ per station results + PSV</span>
             </div>
         </div>
+        <div class="ward-selector">
+            <button class="ward-btn active" id="wardMuminjiBtn">🗳️ Muminji (7)</button>
+            <button class="ward-btn" id="wardEvuroreBtn">🗳️ Evurore (10)</button>
+        </div>
         <div class="top-nav">
-    <div class="nav-left">
-        <a href="pl.html" class="nav-link active">🏠 Public</a>
-        <a href="admin.html" class="nav-link">🛠️ Admin</a>
-        <a href="agent.html" class="nav-link">👤 Agent</a>
-        <a href="clear.html" class="nav-link danger">🗑️ Clear Test</a>
-    </div>
-</div>
+            <div class="nav-left">
+                <a href="index.html"nav-link active">🏠 Public</a>
+                
+            </div>
+        </div>
         <div class="summary-pills" id="headerStats">
             <div class="pill">
                 <div class="pill-label">total votes cast</div>
@@ -423,31 +459,11 @@
         </div>
         <div id="tableContainer">
             <table class="stations-table" id="resultsTable">
-                <thead>
-                    <tr>
-                        <th rowspan="2">Station</th>
-                        <th rowspan="2">Reg Voters</th>
-                        <th rowspan="2">Casted</th>
-                        <th rowspan="2">Rej</th>
-                        <th rowspan="2">Turnout %</th>
-                        <th colspan="7">Votes per Candidate</th>
-                        <th rowspan="2">Winner</th>
-                        <th rowspan="2">Margin</th>
-                        <th rowspan="2">PSV (winner %)</th>
-                        <th rowspan="2">Irregularities</th>
-                    </tr>
-                    <tr>
-                        <th>Ngari B.</th>
-                        <th>Ngari J.</th>
-                        <th>Njeru C.</th>
-                        <th>Njiru J.</th>
-                        <th>Njiru P.</th>
-                        <th>Njuki C.</th>
-                        <th>Nthinga Z.</th>
-                    </tr>
+                <thead id="tableHeader">
+                    <!-- Header will be dynamically generated based on ward -->
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="16" style="text-align:center; padding:40px;">⏳ Loading data from Firebase...</td></tr>
+                    <tr><td colspan="20" style="text-align:center; padding:40px;">⏳ Loading data from Firebase...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -482,8 +498,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Master station list (MUMINJI WARD - 26 stations)
-    const MASTER_STATIONS = [
+    // ==================== WARD DATA ====================
+    
+    // Muminji Ward Stations (26 stations)
+    const MUMINJI_STATIONS = [
         { name: "Kivue Primary School", voters: 686 },
         { name: "Mbarwari Primary School", voters: 586 },
         { name: "Cieria Primary School", voters: 492 },
@@ -512,18 +530,112 @@
         { name: "Mianjatiri Primary School", voters: 131 }
     ];
 
-    // Candidate list (exact names)
-    const CANDIDATES = [
-        { short: "Ngari B.", full: "Ngari Boniface Kariuki", key: "Ngari Boniface Kariuki" },
-        { short: "Ngari J.", full: "Ngari John Nyaga", key: "Ngari John Nyaga" },
-        { short: "Njeru C.", full: "Njeru Cosmas", key: "Njeru Cosmas" },
-        { short: "Njiru J.", full: "Njiru Joseph Ngari", key: "Njiru Joseph Ngari" },
-        { short: "Njiru P.", full: "Njiru Peterson Njeru", key: "Njiru Peterson Njeru" },
-        { short: "Njuki C.", full: "Njuki Charles Kiura", key: "Njuki Charles Kiura" },
-        { short: "Nthinga Z.", full: "Nthinga Zachary Mbogo", key: "Nthinga Zachary Mbogo" }
+    // Evurore Ward Stations (67 stations)
+    const EVURORE_STATIONS = [
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 1)", voters: 589 },
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 2)", voters: 588 },
+        { name: "KANYUAMBORA PRIMARY SCHOOL (Stream 3)", voters: 588 },
+        { name: "KAVENGERO PRIMARY SCHOOL (Stream 1)", voters: 508 },
+        { name: "KAVENGERO PRIMARY SCHOOL (Stream 2)", voters: 508 },
+        { name: "IRIRI PRIMARY SCHOOL", voters: 454 },
+        { name: "GITIE PRIMARY SCHOOL", voters: 636 },
+        { name: "CIANTHIA PRIMARY SCHOOL", voters: 459 },
+        { name: "NGUNYUMU PRIMARY SCHOOL", voters: 607 },
+        { name: "KATHIGAGACERU PRIMARY SCHOOL", voters: 364 },
+        { name: "KATHAGUTARI PRIMARY SCHOOL (Stream 1)", voters: 381 },
+        { name: "KATHAGUTARI PRIMARY SCHOOL (Stream 2)", voters: 380 },
+        { name: "IBUTUKA PRIMARY SCHOOL", voters: 396 },
+        { name: "KUI PRIMARY SCHOOL", voters: 366 },
+        { name: "KARUARI PRIMARY SCHOOL (Stream 1)", voters: 417 },
+        { name: "KARUARI PRIMARY SCHOOL (Stream 2)", voters: 417 },
+        { name: "KIGWAMBITI PRIMARY SCHOOL", voters: 547 },
+        { name: "KIENIRE PRIMARY SCHOOL", voters: 646 },
+        { name: "KAMUKANYA PRIMARY SCHOOL", voters: 370 },
+        { name: "NTAMBARI PRIMARY SCHOOL", voters: 439 },
+        { name: "NGOCE PRIMARY SCHOOL", voters: 649 },
+        { name: "KIRIGO PRIMARY SCHOOL", voters: 423 },
+        { name: "NGARWERERI PRIMARY SCHOOL", voters: 323 },
+        { name: "MUTIRIAIGURU PRIMARY SCHOOL", voters: 325 },
+        { name: "KIANJERU PRIMARY SCHOOL", voters: 464 },
+        { name: "KARANGARE PRIMARY SCHOOL", voters: 552 },
+        { name: "CIANGERA PRIMARY SCHOOL (Stream 1)", voters: 443 },
+        { name: "CIANGERA PRIMARY SCHOOL (Stream 2)", voters: 442 },
+        { name: "NJARANGE PRIMARY SCHOOL", voters: 550 },
+        { name: "MBARAGA PRIMARY SCHOOL", voters: 417 },
+        { name: "MUTHANTHARA PRIMARY SCHOOL", voters: 530 },
+        { name: "KOGARI PRIMARY SCHOOL", voters: 523 },
+        { name: "KAMUTU PRIMARY SCHOOL", voters: 427 },
+        { name: "NTHIGIRANI PRIMARY SCHOOL", voters: 347 },
+        { name: "GATATHA PRIMARY SCHOOL", voters: 424 },
+        { name: "KIATHAMBU PRIMARY SCHOOL", voters: 392 },
+        { name: "KAMWAA PRIMARY SCHOOL", voters: 536 },
+        { name: "KIANTHENGE PRIMARY SCHOOL", voters: 462 },
+        { name: "GWAKAITHI PRIMARY SCHOOL (Stream 1)", voters: 386 },
+        { name: "GWAKAITHI PRIMARY SCHOOL (Stream 2)", voters: 385 },
+        { name: "RWANJERU PRIMARY SCHOOL", voters: 239 },
+        { name: "GATORORORI PRIMARY SCHOOL", voters: 343 },
+        { name: "OVARIRE PRIMARY SCHOOL", voters: 276 },
+        { name: "MANGOTE PRIMARY SCHOOL", voters: 260 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 1)", voters: 653 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 2)", voters: 652 },
+        { name: "ST. PETERS PRIMARY SCHOOL (Stream 3)", voters: 652 },
+        { name: "KANYUERI PRIMARY SCHOOL", voters: 315 },
+        { name: "ST. MARYS KANGANGA PRIMARY SCHOOL", voters: 408 },
+        { name: "ITURURI PRIMARY SCHOOL", voters: 370 },
+        { name: "USAMBARA PRIMARY SCHOOL", voters: 310 },
+        { name: "MUGWANJOGU PRIMARY SCHOOL", voters: 252 },
+        { name: "MBACI PRIMARY SCHOOL", voters: 259 },
+        { name: "KAMARINDO PRIMARY SCHOOL", voters: 284 },
+        { name: "KARIGIRI PRIMARY SCHOOL (Stream 1)", voters: 425 },
+        { name: "KARIGIRI PRIMARY SCHOOL (Stream 2)", voters: 425 },
+        { name: "ST. KIZITO KATHANGARI PR SCHOOL", voters: 628 },
+        { name: "MURANGU PRIMARY SCHOOL", voters: 125 },
+        { name: "CIAIKUNGUGU PRIMARY SCHOOL", voters: 127 },
+        { name: "KAMBUNGU PRIMARY SCHOOL", voters: 218 },
+        { name: "KAMIGUA PRIMARY SCHOOL", voters: 251 },
+        { name: "ST. MICHAEL GACURIRI PR SCHOOL", voters: 171 },
+        { name: "KANYANGI PRIMARY SCHOOL", voters: 23 },
+        { name: "KAMAUA PRIMARY SCHOOL", voters: 27 },
+        { name: "KATHERU PRIMARY SCHOOL", voters: 13 },
+        { name: "KIANJOYA PRIMARY SCHOOL", voters: 11 },
+        { name: "KAMARANDI SECONDARY SCHOOL", voters: 16 }
+    ];
+
+    // Calculate Evurore total voters
+    const EVURORE_TOTAL_VOTERS = EVURORE_STATIONS.reduce((sum, s) => sum + s.voters, 0);
+
+    // Muminji Candidates (7 candidates)
+    const MUMINJI_CANDIDATES = [
+        { short: "Ngari B.", full: "Ngari Boniface Kariuki", party: "" },
+        { short: "Ngari J.", full: "Ngari John Nyaga", party: "" },
+        { short: "Njeru C.", full: "Njeru Cosmas", party: "" },
+        { short: "Njiru J.", full: "Njiru Joseph Ngari", party: "" },
+        { short: "Njiru P.", full: "Njiru Peterson Njeru", party: "" },
+        { short: "Njuki C.", full: "Njuki Charles Kiura", party: "" },
+        { short: "Nthinga Z.", full: "Nthinga Zachary Mbogo", party: "" }
+    ];
+
+    // Evurore Candidates (10 candidates with party codes)
+    const EVURORE_CANDIDATES = [
+        { short: "Eston F.", full: "Eston Fundi Njiru", party: "UMP", partyName: "Umoja Na Maendeleo Party" },
+        { short: "Johnson M.", full: "Johnson Mukui Mate", party: "IND", partyName: "Independent" },
+        { short: "Virginia T.", full: "Virginia Thaara Njiru", party: "KMM", partyName: "Kenya Moja Movement" },
+        { short: "Joseph N.", full: "Joseph Nyaga Njeru", party: "PLP", partyName: "People's Liberation Party" },
+        { short: "Kennedy N.", full: "Kennedy Nthiga Njeru", party: "UGM", partyName: "United Green Movement" },
+        { short: "Martin M.", full: "Martin Mukundi Muriithi", party: "NEDP", partyName: "National Economic Development Party" },
+        { short: "Kenneth N.", full: "Kenneth Njeru Nyaga", party: "CCK", partyName: "Chama Cha Kazi" },
+        { short: "Albert K.", full: "Albert Muchira Kigoro", party: "DPK", partyName: "Democratic Party of Kenya" },
+        { short: "Duncan N.", full: "Duncan Muratia Nyaga", party: "UDA", partyName: "United Democratic Alliance" },
+        { short: "Catherine K.", full: "Catherine Mururi Kabuthi", party: "UPA", partyName: "United Progressive Alliance" }
     ];
 
     // DOM elements
+    const wardNameDisplay = document.getElementById('wardNameDisplay');
+    const totalRegisteredDisplay = document.getElementById('totalRegisteredDisplay');
+    const stationsInfo = document.getElementById('stationsInfo');
+    const wardMuminjiBtn = document.getElementById('wardMuminjiBtn');
+    const wardEvuroreBtn = document.getElementById('wardEvuroreBtn');
+    const tableHeader = document.getElementById('tableHeader');
     const tableBody = document.getElementById('tableBody');
     const candidateTotalsBody = document.getElementById('candidateTotalsBody');
     const filterSelect = document.getElementById('filterStation');
@@ -540,12 +652,82 @@
     const leadingCandidate = document.getElementById('leadingCandidate');
 
     // State
+    let currentWard = 'muminji';
     let firebaseDocs = [];
     let allStations = [];
 
-    // Helper: generate station ID
-    function generateStationId(name) {
-        return name.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, '');
+    // Get current stations based on ward
+    function getCurrentStations() {
+        return currentWard === 'muminji' ? MUMINJI_STATIONS : EVURORE_STATIONS;
+    }
+
+    // Get current candidates based on ward
+    function getCurrentCandidates() {
+        return currentWard === 'muminji' ? MUMINJI_CANDIDATES : EVURORE_CANDIDATES;
+    }
+
+    // Get total registered voters
+    function getTotalRegistered() {
+        return currentWard === 'muminji' ? 9849 : EVURORE_TOTAL_VOTERS;
+    }
+
+    // Helper: generate station ID with ward prefix
+    function generateStationId(name, ward) {
+        return ward + "_" + name.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, '');
+    }
+
+    // Update header based on ward
+    function updateWardHeader() {
+        const stations = getCurrentStations();
+        const totalReg = getTotalRegistered();
+        
+        wardNameDisplay.textContent = currentWard === 'muminji' ? 'Muminji Ward' : 'Evurore Ward';
+        totalRegisteredDisplay.textContent = totalReg.toLocaleString() + ' registered';
+        stationsInfo.textContent = `📍 ${stations.length} polling stations`;
+        
+        // Update button active states
+        if (currentWard === 'muminji') {
+            wardMuminjiBtn.classList.add('active');
+            wardEvuroreBtn.classList.remove('active');
+        } else {
+            wardEvuroreBtn.classList.add('active');
+            wardMuminjiBtn.classList.remove('active');
+        }
+        
+        // Update table header
+        updateTableHeader();
+        
+        // Re-merge and render with new ward data
+        mergeData();
+    }
+
+    // Update table header based on current ward
+    function updateTableHeader() {
+        const candidates = getCurrentCandidates();
+        
+        let headerHtml = `
+            <tr>
+                <th rowspan="2">Station</th>
+                <th rowspan="2">Reg Voters</th>
+                <th rowspan="2">Casted</th>
+                <th rowspan="2">Rej</th>
+                <th rowspan="2">Turnout %</th>
+                <th colspan="${candidates.length}">Votes per Candidate</th>
+                <th rowspan="2">Winner</th>
+                <th rowspan="2">Margin</th>
+                <th rowspan="2">PSV (winner %)</th>
+                <th rowspan="2">Irregularities</th>
+            </tr>
+            <tr>
+        `;
+        
+        candidates.forEach(c => {
+            const partyHtml = c.party ? ` <span class="party-badge">${c.party}</span>` : '';
+            headerHtml += `<th>${c.short}${partyHtml}</th>`;
+        });
+        
+        headerHtml += `</tr>`;
+        tableHeader.innerHTML = headerHtml;
     }
 
     // Fetch data from Firebase
@@ -560,8 +742,6 @@
             mergeData();
         } catch (error) {
             console.error("Error fetching:", error);
-            alert("Error loading data. Using demo data.");
-            // Use empty array - will show pending stations
             firebaseDocs = [];
             mergeData();
         }
@@ -569,12 +749,14 @@
 
     // Merge with master stations
     function mergeData() {
-        allStations = MASTER_STATIONS.map(station => {
-            const stationId = generateStationId(station.name);
+        const currentStations = getCurrentStations();
+        
+        allStations = currentStations.map(station => {
+            const stationId = generateStationId(station.name, currentWard);
             const fbMatch = firebaseDocs.find(doc => 
                 doc.id === stationId || 
-                (doc.stationName && generateStationId(doc.stationName) === stationId) ||
-                doc.stationName === station.name
+                (doc.stationName && generateStationId(doc.stationName, currentWard) === stationId) ||
+                (doc.stationName === station.name && doc.ward && doc.ward.toLowerCase() === currentWard)
             );
             
             return {
@@ -592,6 +774,7 @@
 
     // Render main table
     function renderTable() {
+        const candidates = getCurrentCandidates();
         const filter = filterSelect.value;
         const sort = sortBy.value;
         
@@ -618,7 +801,7 @@
         
         // Update count
         const reportedCount = allStations.filter(s => s.reported).length;
-        stationsCount.innerText = `${reportedCount}/${MASTER_STATIONS.length} stations reported`;
+        stationsCount.innerText = `${reportedCount}/${allStations.length} stations reported`;
         
         // Calculate totals
         let totalCasted = 0, totalRej = 0, totalRegReported = 0;
@@ -635,7 +818,7 @@
         turnoutPct.innerText = turnout + '%';
         
         if (filtered.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="16" style="padding:40px;">No stations match filter</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="${candidates.length + 9}" style="padding:40px;">No stations match filter</td></tr>`;
             return;
         }
         
@@ -650,19 +833,18 @@
                     <td class="station-name">${station.name} ⏳</td>
                     <td>${station.voters}</td>
                     <td>—</td><td>—</td><td>—</td>
-                    ${CANDIDATES.map(() => '<td>—</td>').join('')}
+                    ${candidates.map(() => '<td>—</td>').join('')}
                     <td>—</td><td>—</td><td>—</td>
                     <td><span style="background:#fff2d6; padding:2px 8px; border-radius:20px;">pending</span></td>
                 </tr>`;
                 return;
             }
             
-            // Get votes for each candidate
+            // Get votes for each candidate (prefer IEBC votes)
             const agentVotes = fb.agentVotes || {};
             const iebcVotes = fb.iebcVotes || {};
             
-            // Use IEBC votes as official (or agent if IEBC missing)
-            const votes = CANDIDATES.map(c => {
+            const votes = candidates.map(c => {
                 return Number(iebcVotes[c.full] || agentVotes[c.full] || 0);
             });
             
@@ -673,7 +855,7 @@
             // Find winner and margin
             let maxVotes = Math.max(...votes);
             let winnerIndex = votes.indexOf(maxVotes);
-            let winnerName = CANDIDATES[winnerIndex]?.short || 'Unknown';
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
             
             // Find runner-up
             let sortedVotes = [...votes].sort((a,b) => b - a);
@@ -685,7 +867,7 @@
             
             // Irregularities
             const hasDiscrepancy = fb.discrepancyDetected || false;
-            const irregularityNote = hasDiscrepancy ? '⚠️ Agent/IEBC mismatch' : '';
+            const irregularityNote = hasDiscrepancy ? '⚠️ Mismatch' : '';
             
             html += `<tr ${hasDiscrepancy ? 'class="irregularity-cell"' : ''}>
                 <td class="station-name">${station.name}</td>
@@ -706,12 +888,14 @@
 
     // Render candidate totals
     function renderCandidateTotals() {
-        // Calculate totals from all reported stations (use IEBC votes)
+        const candidates = getCurrentCandidates();
+        
+        // Calculate totals from all reported stations
         let totals = {};
-        CANDIDATES.forEach(c => totals[c.full] = 0);
+        candidates.forEach(c => totals[c.full] = 0);
         
         let stationsWon = {};
-        CANDIDATES.forEach(c => stationsWon[c.full] = 0);
+        candidates.forEach(c => stationsWon[c.full] = 0);
         
         let totalCasted = 0;
         
@@ -724,7 +908,7 @@
             
             // Count votes (prefer IEBC)
             let stationVotes = [];
-            CANDIDATES.forEach((c, idx) => {
+            candidates.forEach((c, idx) => {
                 const vote = Number(iebcVotes[c.full] || agentVotes[c.full] || 0);
                 totals[c.full] += vote;
                 stationVotes.push(vote);
@@ -734,16 +918,17 @@
             let maxVotes = Math.max(...stationVotes);
             let winnerIdx = stationVotes.indexOf(maxVotes);
             if (winnerIdx >= 0) {
-                stationsWon[CANDIDATES[winnerIdx].full] += 1;
+                stationsWon[candidates[winnerIdx].full] += 1;
             }
             
             totalCasted += Number(fb.castedVotes) || 0;
         });
         
         // Create array for sorting
-        let candidateArray = CANDIDATES.map(c => ({
+        let candidateArray = candidates.map(c => ({
             name: c.short,
             full: c.full,
+            party: c.party || '',
             votes: totals[c.full],
             psv: totalCasted > 0 ? ((totals[c.full] / totalCasted) * 100).toFixed(1) : '0.0',
             won: stationsWon[c.full]
@@ -761,9 +946,10 @@
         candidateArray.forEach((cand, index) => {
             const rankClass = index === 0 ? 'rank-1' : '';
             const margin = index === 0 ? (cand.votes - (candidateArray[1]?.votes || 0)) : (candidateArray[0].votes - cand.votes);
+            const partyBadge = cand.party ? ` <span class="party-badge">${cand.party}</span>` : '';
             
             html += `<tr class="${rankClass}">
-                <td><strong>${cand.name}</strong></td>
+                <td><strong>${cand.name}${partyBadge}</strong></td>
                 <td><strong>${cand.votes.toLocaleString()}</strong></td>
                 <td>${cand.psv}% 
                     <span class="progress-bar">
@@ -792,11 +978,12 @@
 
     // Download data as CSV
     function downloadData(format) {
+        const candidates = getCurrentCandidates();
         let csv = '';
         
         // Add header
         csv += 'Station,Registered,Casted,Rejected,Turnout %,';
-        CANDIDATES.forEach(c => csv += `${c.short},`);
+        candidates.forEach(c => csv += `${c.short},`);
         csv += 'Winner,Margin,PSV %,Irregularities\n';
         
         // Add rows
@@ -807,14 +994,14 @@
             const agentVotes = fb.agentVotes || {};
             const iebcVotes = fb.iebcVotes || {};
             
-            const votes = CANDIDATES.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
+            const votes = candidates.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
             const casted = Number(fb.castedVotes) || 0;
             const rejected = Number(fb.rejectedVotes) || 0;
             const turnout = station.voters > 0 ? ((casted / station.voters) * 100).toFixed(1) : '0.0';
             
             let maxVotes = Math.max(...votes);
             let winnerIndex = votes.indexOf(maxVotes);
-            let winnerName = CANDIDATES[winnerIndex]?.short || 'Unknown';
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
             
             let sortedVotes = [...votes].sort((a,b) => b - a);
             let margin = maxVotes - (sortedVotes[1] || 0);
@@ -832,7 +1019,7 @@
         csv += `${totalCasted},${totalRej},,`;
         
         // Candidate totals
-        CANDIDATES.forEach(c => {
+        candidates.forEach(c => {
             let total = 0;
             allStations.forEach(s => {
                 if(s.reported) {
@@ -847,28 +1034,31 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `muminji_results_${new Date().toISOString().slice(0,10)}.${format === 'excel' ? 'xls' : 'csv'}`;
+        a.download = `${currentWard}_results_${new Date().toISOString().slice(0,10)}.${format === 'excel' ? 'xls' : 'csv'}`;
         a.click();
     }
 
-    // Download PDF function (renamed to avoid conflict)
+    // Download PDF function
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('landscape', 'mm', 'a4');
+        const candidates = getCurrentCandidates();
+        const stations = getCurrentStations();
+        const totalReg = getTotalRegistered();
         
         // Title
         doc.setFontSize(18);
-        doc.text('Muminji Ward - Final Results', 14, 15);
+        doc.text(`${currentWard === 'muminji' ? 'Muminji' : 'Evurore'} Ward - Final Results`, 14, 15);
         doc.setFontSize(10);
         doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 22);
-        doc.text(`Total Registered: 9,849 | Stations Reported: ${allStations.filter(s => s.reported).length}/26`, 14, 28);
+        doc.text(`Total Registered: ${totalReg.toLocaleString()} | Stations Reported: ${allStations.filter(s => s.reported).length}/${stations.length}`, 14, 28);
         
         // Candidate totals table
         const candidateData = [];
         let totalCasted = 0;
         allStations.forEach(s => { if(s.reported) totalCasted += Number(s.firebase?.castedVotes) || 0; });
         
-        CANDIDATES.forEach(c => {
+        candidates.forEach(c => {
             let total = 0;
             allStations.forEach(s => {
                 if(s.reported) {
@@ -897,14 +1087,14 @@
             const agentVotes = fb.agentVotes || {};
             const iebcVotes = fb.iebcVotes || {};
             
-            const votes = CANDIDATES.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
+            const votes = candidates.map(c => Number(iebcVotes[c.full] || agentVotes[c.full] || 0));
             const casted = Number(fb.castedVotes) || 0;
             const rejected = Number(fb.rejectedVotes) || 0;
             const turnout = station.voters > 0 ? ((casted / station.voters) * 100).toFixed(1) : '0.0';
             
             let maxVotes = Math.max(...votes);
             let winnerIndex = votes.indexOf(maxVotes);
-            let winnerName = CANDIDATES[winnerIndex]?.short || 'Unknown';
+            let winnerName = candidates[winnerIndex]?.short || 'Unknown';
             
             let sortedVotes = [...votes].sort((a,b) => b - a);
             let margin = maxVotes - (sortedVotes[1] || 0);
@@ -926,7 +1116,7 @@
         
         const headers = [
             'Station', 'Reg', 'Casted', 'Rej', 'Turnout',
-            'Ngari B.', 'Ngari J.', 'Njeru C.', 'Njiru J.', 'Njiru P.', 'Njuki C.', 'Nthinga Z.',
+            ...candidates.map(c => c.short),
             'Winner', 'Margin', 'PSV', 'Irregularities'
         ];
         
@@ -940,18 +1130,33 @@
             columnStyles: { 0: { cellWidth: 40 } }
         });
         
-        doc.save(`muminji_results_${new Date().toISOString().slice(0,10)}.pdf`);
+        doc.save(`${currentWard}_results_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     // Event listeners
     filterSelect.addEventListener('change', renderTable);
     sortBy.addEventListener('change', renderTable);
-    refreshBtn.addEventListener('click', () => fetchData().then(() => renderTable()));
+    refreshBtn.addEventListener('click', () => fetchData());
     downloadCSV.addEventListener('click', () => downloadData('csv'));
     downloadExcel.addEventListener('click', () => downloadData('excel'));
     downloadPdfBtn.addEventListener('click', generatePDF);
+    
+    wardMuminjiBtn.addEventListener('click', () => {
+        if (currentWard === 'muminji') return;
+        currentWard = 'muminji';
+        updateWardHeader();
+        fetchData();
+    });
+    
+    wardEvuroreBtn.addEventListener('click', () => {
+        if (currentWard === 'evurore') return;
+        currentWard = 'evurore';
+        updateWardHeader();
+        fetchData();
+    });
 
     // Initial load
+    updateWardHeader();
     fetchData();
 </script>
 </body>
